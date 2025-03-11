@@ -1,22 +1,32 @@
-version: 0.2 
- 
-phases: 
-  install: 
-    commands: 
+version: 0.2
+
+phases:
+  install:
+    commands:
       - echo Installing NGINX 
       - sudo apt-get update 
       - sudo apt-get install nginx -y 
-  build: 
-    commands: 
+
+  build:
+    commands:
       - echo Build started on $(date) 
-      - sudo cp index.html /var/www/html/ 
-      - sudo cp -r css /var/www/html/ 
-      - sudo cp -r images /var/www/html/ 
-      - sudo cp -r js /var/www/html/ 
-  post_build: 
-    commands: 
+      - echo "Creating target directory..."
+      - sudo mkdir -p /var/www/html
+      - echo "Checking if index.html exists..."
+      - ls -la | grep "index.html" || echo "index.html not found!"
+      - echo "Setting correct permissions..."
+      - sudo chown -R $USER:$USER /var/www/html
+      - sudo chmod -R 755 /var/www/html
+      - echo "Copying files..."
+      - sudo cp -v index.html /var/www/html/ || echo "Failed to copy index.html"
+      - sudo cp -rv css /var/www/html/ || echo "Failed to copy css"
+      - sudo cp -rv images /var/www/html/ || echo "Failed to copy images"
+      - sudo cp -rv js /var/www/html/ || echo "Failed to copy js"
+
+  post_build:
+    commands:
       - echo Configuring NGINX 
- 
-artifacts: 
-  files: 
+
+artifacts:
+  files:
     - '**/*'
