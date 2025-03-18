@@ -1,0 +1,31 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing NGINX and PHP"
+      - sudo apt-get update
+      - sudo apt-get install -y nginx php php-fpm php-mysql unzip
+
+  build:
+    commands:
+      - echo "Build started on $(date)"
+      - echo "Creating target directory..."
+      - sudo mkdir -p /var/www/html
+      - echo "Checking if Home_Page.php exists..."
+      - if [ ! -f Home_Page.php ]; then echo "Home_Page.php NOT found!"; exit 1; fi
+      - echo "Setting correct permissions..."
+      - sudo chown -R www-data:www-data /var/www/html
+      - sudo chmod -R 755 /var/www/html
+      - echo "Copying website files..."
+      - sudo cp -rv * /var/www/html/ || echo "Failed to copy files"
+
+  post_build:
+    commands:
+      - echo "Restarting PHP and NGINX..."
+      - sudo systemctl restart php-fpm
+      - sudo systemctl restart nginx
+
+artifacts:
+  files:
+    - '**/*'
